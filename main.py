@@ -43,6 +43,7 @@ def give_data(district):
         district_features = boundarycoll.filter(ee.Filter.eq('ADM2_NAME',district))
         # district_features = circular_region
 
+        #Input year (this can be taken as an inpput from UI)
         year='2010'
         number = ee.Number(int(year))
 
@@ -57,6 +58,7 @@ def give_data(district):
         rainfall_coll = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY")# Temporal Resolution = 1 Day
         
         
+        #Get the Scale(Resolution) of the data
         rainfall_projection = rainfall_coll.first().projection()
         rainfall_scale = rainfall_projection.nominalScale()
         population_projection = population_coll.first().projection()
@@ -71,6 +73,8 @@ def give_data(district):
 
         filtered_coll = [None]*3
 
+        # Filtering the collection for a period of one year 
+        
         def year_filter(number):
                 
                 start_date = ee.Date.fromYMD(number, 1, 1)
@@ -83,16 +87,22 @@ def give_data(district):
 
 
 
+        # For the time duration we can sum, take average etc of the data
+        # Here we are taking sum for rainfall data and average for Poulation and climate data  
+        
         rainfall_sum = filtered_coll[2].reduce(ee.Reducer.sum())
         popul_mean = filtered_coll[0].reduce(ee.Reducer.mean())
         cli_mean = filtered_coll[1].reduce(ee.Reducer.mean())
 
 
 
+       
 
         rainfall_data = rainfall_sum.reduceRegion(
                                                     
-                                                    reducer= ee.Reducer.mean(),
+                                                    reducer= ee.Reducer.mean(), #For given region we are taking the mean value of the pixels to 
+                                                                                #output the data, again here also we can perform sum 
+                                                                                # or take maximum/minimum values as per our requirement.
                                                     geometry=district_features,
                                                     scale= rainfall_scale
                                                     
