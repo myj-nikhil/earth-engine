@@ -124,6 +124,7 @@ def give_data(district):
              'climate': modified_climate_key_data,
              'soil': modified_soil_key_data
              }
+        print(out_dict)
         
         return (out_dict)
 
