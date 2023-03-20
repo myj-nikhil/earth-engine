@@ -1,7 +1,12 @@
+<!DOCTYPE html>
 <html>
-  <title>Flask app</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<form action="" method="get">
+  <head>
+    <title>Earth Engine Web App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main.css') }}">
+  </head>
+
+  <body>
+  <form action="" method="get">
     Please enter the name of District: <input type="text" name="district">
     <input type="submit" value="Show the data">
 </form>
@@ -21,7 +26,7 @@
 
 <h3>{{district}}</h3>
 {% if district %}
-<p>The population density in the yeaar 2010 per sq. km: {{population}} </p>
+<p>The population density in the year 2010 per sq. km: {{population}} </p>
 <p>The total rainfall in the year 2010 in mm: {{rainfall}}</p>
 <table>
   <thead>
@@ -56,6 +61,7 @@
   </tbody>
 </table>
 {% endif %}
+</body>
 </html>
 
  
