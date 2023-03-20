@@ -20,15 +20,24 @@ def index():
 def give_data(district):
     try:
         organic_carbon = ee.Image("OpenLandMap/SOL/SOL_ORGANIC-CARBON_USDA-6A1C_M/v02")
-        Mumbai_Coordinates = ee.Geometry.Polygon([[72.820578,19.044863],[72.788306,19.265397],[72.830191,19.249840],[72.852851,19.268638],[72.934562,19.194729],[72.978507,19.156464],[72.955848,19.081207],[72.956534,19.029285],[72.885810,18.996826],[72.878257,19.047460],[72.820578,19.044863]])
-        # dd_long = 83.395551
-        # dd_lat = 18.106658
-        # coordinates=ee.Geometry.Point(dd_long,dd_lat)
-        # circular_region = coordinates.buffer(100000)
+        
+        # Method 1: Defining the region with coordinates obtianed manually , 
+        # Mumbai_Coordinates are the boundary coordinates of Mumbai Suburban 
+        Mumbai_Coordinates = ee.Geometry.Polygon([[72.820578,19.044863],[72.788306,19.265397],[72.830191,19.249840],
+                                                  [72.852851,19.268638],[72.934562,19.194729],[72.978507,19.156464],[72.955848,19.081207],
+                                                  [72.956534,19.029285],[72.885810,18.996826],[72.878257,19.047460],[72.820578,19.044863]])
+        
+        # Method 2: Defining region with single pair of coordinates, in this case we can give a radis(in meters)
+        # and can calculate the values of a circular region 
+        
+        dd_long = 83.395551
+        dd_lat = 18.106658
+        coordinates=ee.Geometry.Point(dd_long,dd_lat)
+        circular_region = coordinates.buffer(100000)
 
-            # Method 2 : Defining the region from the features of an existing feature collection by FAO.(Food and Agricultural Organisation)
-            # We have Level 2 Administrative regions's(Districts) features from the FeatureCollection("FAO/GAUL/2015/level2")
-            # Import the featurecollection
+        # Method 3 : Defining the region from the features of an existing feature collection by FAO.(Food and Agricultural Organisation)
+        # We have Level 2 Administrative regions's(Districts) features from the FeatureCollection("FAO/GAUL/2015/level2")
+        # Import the featurecollection
         boundarycoll = ee.FeatureCollection("FAO/GAUL/2015/level2")
 
         district_features = boundarycoll.filter(ee.Filter.eq('ADM2_NAME',district))
@@ -88,8 +97,6 @@ def give_data(district):
                                                     scale= rainfall_scale
                                                     
                                                     ).getInfo()['precipitation_sum']
-        # if (rainfall_data is not None):
-        #     final_rainfall_data = round(rainfall_data['precipitation_sum'])
         
         population_density_data = popul_mean.reduceRegion(
                                                     
