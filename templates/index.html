@@ -1,0 +1,60 @@
+<html>
+
+<form action="" method="get">
+    Please enter the name of District: <input type="text" name="district">
+    <input type="submit" value="Show the data">
+</form>
+
+<!-- <form action="" method="get">
+  <label for="year">Select an year:</label>
+  <select name="year" id="year">
+    <option value="2000">2000</option>
+    <option value="2005">2005</option>
+    <option value="2010">2010</option>
+    <option value="2015">2015</option>
+    <option value="2015">2020</option>
+  </select>
+  <br><br>
+  <input type="submit" value="Submit">
+</form> -->
+
+<h3>{{district}}</h3>
+{% if district %}
+<p>The population density per sq. km: {{population}} </p>
+<p>The total rainfall in mm: {{rainfall}}</p>
+<table>
+  <thead>
+    <tr>
+      <th>Climate Parameter (monthly Average)</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for key, value in output.get('climate').items() %}
+   <tr>
+       <td> {{ key }} </td>
+       <td> {{ value }} </td>
+   </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>Soil Parameter (monthly Average) </th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for key, value in output.get('soil').items() %}
+   <tr>
+       <td> {{ key }} </td>
+       <td> {{ value }} </td>
+   </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+</html>
+
+ 
