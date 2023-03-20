@@ -1,6 +1,12 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <title>Earth Engine Web App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main.css') }}">
+  </head>
 
-<form action="" method="get">
+  <body>
+  <form action="" method="get">
     Please enter the name of District: <input type="text" name="district">
     <input type="submit" value="Show the data">
 </form>
@@ -20,8 +26,8 @@
 
 <h3>{{district}}</h3>
 {% if district %}
-<p>The population density per sq. km: {{population}} </p>
-<p>The total rainfall in mm: {{rainfall}}</p>
+<p>The population density in the year 2010 per sq. km: {{population}} </p>
+<p>The total rainfall in the year 2010 in mm: {{rainfall}}</p>
 <table>
   <thead>
     <tr>
@@ -41,8 +47,8 @@
 <table>
   <thead>
     <tr>
-      <th>Soil Parameter (monthly Average) </th>
-      <th>Value</th>
+      <th>Soil Parameter</th>
+      <th>(x5g/Kg)</th>
     </tr>
   </thead>
   <tbody>
@@ -55,6 +61,7 @@
   </tbody>
 </table>
 {% endif %}
+</body>
 </html>
 
  
