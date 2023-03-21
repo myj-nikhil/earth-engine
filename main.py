@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
       district = request.args.get("district", "")
-    #   year = request.args.get("year","")
+      #year = request.args.get("year","")
       output = give_data(district)
       return render_template('index.html',district=district,output=output,population = output.get('population'),rainfall=output.get('rainfall'))
 
@@ -153,5 +153,5 @@ def give_data(district):
 
 
 
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)
+# if __name__ == "__main__":
+#     app.run(host="127.0.0.1", port=8080, debug=True)
