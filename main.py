@@ -1,7 +1,7 @@
 
 import ee
-service_account = 'helpful-aurora-380816@appspot.gserviceaccount.com'
-credentials = ee.ServiceAccountCredentials(service_account, 'private-key.json')
+service_account = 'dulcet-order-380816@appspot.gserviceaccount.com'
+credentials = ee.ServiceAccountCredentials(service_account, 'dulcet-order-380816-c70b6f72a2bc.json')
 ee.Initialize(credentials)
 from flask import Flask, render_template
 from flask import request 
@@ -52,9 +52,9 @@ def give_data(district):
         population_coll = ee.ImageCollection("CIESIN/GPWv411/GPW_Population_Density")  # Temporal Res = 5 years
         # Load the image of Soil Organic Carbon content
         organic_carbon = ee.Image("OpenLandMap/SOL/SOL_ORGANIC-CARBON_USDA-6A1C_M/v02") 
-            #Load the climate data
+        #Load the climate data
         climate_coll = ee.ImageCollection("NASA/FLDAS/NOAH01/C/GL/M/V001") #Temporal Resolution = 1 Month
-            #Load the rainfall data
+        #Load the rainfall data
         rainfall_coll = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY")# Temporal Resolution = 1 Day
         
         
@@ -88,7 +88,7 @@ def give_data(district):
 
 
         # For the time duration we can sum, take average etc of the data
-        # Here we are taking sum for rainfall data and average for Poulation and climate data  
+        # Here we are taking sum for rainfall data and average for Population and climate data  
         
         rainfall_sum = filtered_coll[2].reduce(ee.Reducer.sum())
         popul_mean = filtered_coll[0].reduce(ee.Reducer.mean())
@@ -124,6 +124,7 @@ def give_data(district):
                                                     scale=climate_scale
                                                     
                                                     ).getInfo()
+        
         soil_data = organic_carbon.reduceRegion('mean', district_features).getInfo()
 
 
