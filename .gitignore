@@ -1,3 +1,4 @@
+.gitignore
 dulcet-order-380816-c70b6f72a2bc.json
 testenv/
 *.json
