@@ -33,7 +33,7 @@ def give_data(district):
         dd_long = 83.395551
         dd_lat = 18.106658
         coordinates=ee.Geometry.Point(dd_long,dd_lat)
-        circular_region = coordinates.buffer(100000)
+        circular_region = coordinates.buffer(100)
 
         # Method 3 : Defining the region from the features of an existing feature collection by FAO.(Food and Agricultural Organisation)
         # We have Level 2 Administrative regions's(Districts) features from the FeatureCollection("FAO/GAUL/2015/level2")
@@ -153,5 +153,5 @@ def give_data(district):
 
 
 
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)
+# if __name__ == "__main__":
+#     app.run(host="127.0.0.1", port=8080, debug=True)
