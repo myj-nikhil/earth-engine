@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
       district = request.args.get("district", "")
-      #year = request.args.get("year","")
+    #   year = request.args.get("year","")
       output = give_data(district)
       return render_template('index.html',district=district,output=output,population = output.get('population'),rainfall=output.get('rainfall'))
 
@@ -33,7 +33,7 @@ def give_data(district):
         dd_long = 83.395551
         dd_lat = 18.106658
         coordinates=ee.Geometry.Point(dd_long,dd_lat)
-        circular_region = coordinates.buffer(100000)
+        circular_region = coordinates.buffer(100)
 
         # Method 3 : Defining the region from the features of an existing feature collection by FAO.(Food and Agricultural Organisation)
         # We have Level 2 Administrative regions's(Districts) features from the FeatureCollection("FAO/GAUL/2015/level2")
