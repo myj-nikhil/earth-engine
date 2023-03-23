@@ -7,7 +7,8 @@
 
   <body>
   <form action="" method="get">
-    Please enter the name of District: <input type="text" name="district">
+    Please enter the latitude: <input type="number" step="0.001" name="latitude">
+    Please enter the longitude: <input type="number" step="0.001" name="longitude">
     <input type="submit" value="Show the data">
 </form>
 
@@ -24,8 +25,7 @@
   <input type="submit" value="Submit">
 </form> -->
 
-<h3>{{district}}</h3>
-{% if district %}
+<h3>Values for the Co-ordinates {{dd_lat}} ,{{dd_long}} </h3>
 <p>The population density in the year 2010 per sq. km: {{population}} </p>
 <p>The total rainfall in the year 2010 in mm: {{rainfall}}</p>
 <table>
@@ -60,7 +60,6 @@
   {% endfor %}
   </tbody>
 </table>
-{% endif %}
 </body>
 </html>
 

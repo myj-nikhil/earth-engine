@@ -1,4 +1,3 @@
-
 import ee
 service_account = 'dulcet-order-380816@appspot.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, 'dulcet-order-380816-c70b6f72a2bc.json')
@@ -10,14 +9,18 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-      district = request.args.get("district", "")
-    #   year = request.args.get("year","")
-      output = give_data(district)
-      return render_template('index.html',district=district,output=output,population = output.get('population'),rainfall=output.get('rainfall'))
+      dd_long = request.args.get("longitude", "0")
+      dd_lat = request.args.get("latitude","0")
+      print(dd_lat,dd_long)
+      coordinates=ee.Geometry.Point([float(dd_long),float(dd_lat)])
+      print(coordinates.getInfo())
+      circular_region = coordinates
+      output = give_data(circular_region)
+      return render_template('another.html',output=output,population = output.get('population'),rainfall=output.get('rainfall'),dd_long=dd_long,dd_lat=dd_lat)
 
 
 
-def give_data(district):
+def give_data(circular_region):
     try:
         organic_carbon = ee.Image("OpenLandMap/SOL/SOL_ORGANIC-CARBON_USDA-6A1C_M/v02")
         
@@ -32,15 +35,14 @@ def give_data(district):
         
         dd_long = 83.395551
         dd_lat = 18.106658
-        coordinates=ee.Geometry.Point(dd_long,dd_lat)
-        circular_region = coordinates.buffer(100)
+        
 
         # Method 3 : Defining the region from the features of an existing feature collection by FAO.(Food and Agricultural Organisation)
         # We have Level 2 Administrative regions's(Districts) features from the FeatureCollection("FAO/GAUL/2015/level2")
         # Import the featurecollection
-        boundarycoll = ee.FeatureCollection("FAO/GAUL/2015/level2")
+        # boundarycoll = ee.FeatureCollection("FAO/GAUL/2015/level2")
 
-        district_features = boundarycoll.filter(ee.Filter.eq('ADM2_NAME',district))
+        # district_features = boundarycoll.filter(ee.Filter.eq('ADM2_NAME',district))
         # district_features = circular_region
 
         #Input year (this can be taken as an inpput from UI)
@@ -103,7 +105,7 @@ def give_data(district):
                                                     reducer= ee.Reducer.mean(), #For given region we are taking the mean value of the pixels to 
                                                                                 #output the data, again here also we can perform sum 
                                                                                 # or take maximum/minimum values as per our requirement.
-                                                    geometry=district_features,
+                                                    geometry=circular_region,
                                                     scale= rainfall_scale
                                                     
                                                     ).getInfo()['precipitation_sum']
@@ -111,7 +113,7 @@ def give_data(district):
         population_density_data = popul_mean.reduceRegion(
                                                     
                                                     reducer= ee.Reducer.mean(),
-                                                    geometry=district_features,
+                                                    geometry=circular_region,
                                                     scale=population_scale
                                                     
                                                     ).getInfo()['population_density_mean']
@@ -120,12 +122,12 @@ def give_data(district):
         climate_data = cli_mean.reduceRegion(
                                                     
                                                     reducer= ee.Reducer.mean(),
-                                                    geometry=district_features,
+                                                    geometry=circular_region,
                                                     scale=climate_scale
                                                     
                                                     ).getInfo()
         
-        soil_data = organic_carbon.reduceRegion('mean', district_features).getInfo()
+        soil_data = organic_carbon.reduceRegion('mean', circular_region).getInfo()
 
 
 
@@ -149,9 +151,7 @@ def give_data(district):
     except ValueError:
         return "Invalid Input"
     
-
-
-
-
-# if __name__ == "__main__":
-#     app.run(host="127.0.0.1", port=8080, debug=True)
+    
+    
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8080, debug=True)
