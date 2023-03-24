@@ -4,63 +4,24 @@
     <title>Earth Engine Web App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main.css') }}">
   </head>
-
+<h1>
+  Earth Engine Web App
+</h1>
   <body>
-  <form action="" method="get">
-    Please enter the latitude: <input type="number" step="0.001" name="latitude">
-    Please enter the longitude: <input type="number" step="0.001" name="longitude">
-    <input type="submit" value="Show the data">
-</form>
-
-<!-- <form action="" method="get">
-  <label for="year">Select an year:</label>
-  <select name="year" id="year">
-    <option value="2000">2000</option>
-    <option value="2005">2005</option>
-    <option value="2010">2010</option>
-    <option value="2015">2015</option>
-    <option value="2015">2020</option>
-  </select>
-  <br><br>
-  <input type="submit" value="Submit">
-</form> -->
-
-<h3>Values for the Co-ordinates {{dd_lat}} ,{{dd_long}} </h3>
-<p>The population density in the year 2010 per sq. km: {{population}} </p>
-<p>The total rainfall in the year 2010 in mm: {{rainfall}}</p>
-<table>
-  <thead>
-    <tr>
-      <th>Climate Parameter (monthly Average)</th>
-      <th>Value</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for key, value in output.get('climate').items() %}
-   <tr>
-       <td> {{ key }} </td>
-       <td> {{ value }} </td>
-   </tr>
-  {% endfor %}
-  </tbody>
-</table>
-<table>
-  <thead>
-    <tr>
-      <th>Soil Parameter</th>
-      <th>(x5g/Kg)</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for key, value in output.get('soil').items() %}
-   <tr>
-       <td> {{ key }} </td>
-       <td> {{ value }} </td>
-   </tr>
-  {% endfor %}
-  </tbody>
-</table>
+  <form action="result" method="post">
+    <div class="input-container">
+      <label>Latitude:</label>
+      <input type="number" step="0.000001" name="latitude" value= "{{ request.form.latitude }}" required>
+    </div>
+    <div class="input-container">
+      <label id ="longitude">Longitude:</label>
+      <input type="number" step="0.000001" name="longitude" value = "{{ request.form.longitude }}"  required>
+    </div>    
+    <input type="submit" value="Get data">
+    <p> Note: Enter the Latitude and Longitude values in Decimal Degrees</p>
+    <p>The Co-ordinates of Mumbai in Decimal Degrees: : 19.0760 , 72.8777</p>
+  </form>
 </body>
 </html>
 
- 
+  
