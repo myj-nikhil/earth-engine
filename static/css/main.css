@@ -1,5 +1,75 @@
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: papayawhip;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+}
+/* Center the form */
+h1 {
+  text-align: center;
 }
 
+h3 {
+  text-align:left;
+  font-size: 28px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+/* Style the input fields */
+input[type="number"] {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #f2f2f2;
+  font-size: 12px;
+}
+
+/* Style the submit button */
+input[type="submit"] {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+/* Style the headings */
+h3, p {
+  margin: 20px;
+}
+
+/* Style the table */
+table {
+  border-collapse: collapse;
+  margin: 20px;
+  width: 100%;
+}
+
+/* Style the table headings */
+th {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+/* Style the table rows */
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Style the table data */
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+#longitude {
+  margin-left: -15px;
+}
