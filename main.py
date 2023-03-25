@@ -27,7 +27,7 @@ def ans():
             print(output)
       return render_template('result.html',output=output,dd_long=dd_long,dd_lat = dd_lat,population = output.get('population'),rainfall=output.get('rainfall'))
 
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)  
+# if __name__ == "__main__":
+#     app.run(host="127.0.0.1", port=8080, debug=True)  
 
 
