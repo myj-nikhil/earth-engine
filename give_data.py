@@ -117,7 +117,7 @@ def given_data(region):
              if climate_data[key] is not None:
                 climate_data[key]=round(climate_data[key],5)
                 print(key)
-        # else: climate_data[key] = 'Data is not available'
+             else: climate_data[key] = 'Data is not available'
     
         
         
@@ -127,7 +127,7 @@ def given_data(region):
         for key in soil_data:
              if soil_data[key] is not None:
                 soil_data[key]=round(soil_data[key]/2)
-        # else:    soil_data[key]='Data is not available'
+             else: soil_data[key]='Data is not available'
 
 
         soilkey_list = ['Soil organic carbon content at 0 cm depth', 'Soil organic carbon content at 10 cm depth', 'Soil organic carbon content at 100 cm depth', 'Soil organic carbon content at 200 cm depth','Soil organic carbon content at 30 cm depth','Soil organic carbon content at 60 cm depth']
