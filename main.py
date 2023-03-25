@@ -5,6 +5,7 @@ import ee
 
 app = Flask(__name__)
 
+#Home page of the App
 @app.route("/")
 def index():
       return render_template('index.html')
