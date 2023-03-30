@@ -42,7 +42,7 @@ function myfunction() {
             const area = turf.area(data);
             const rounded_area = Math.round(area * 100) / 100;
             console.log("Type of request to Python server is ", typeof s)
-            console.log("Doubly JSON Stringified input:", s);
+            console.log("JSON Stringified input:", s);
             targetArea.innerHTML = `<p>Calculating...</p>`
             $.ajax({
                 url: "/calculate",
