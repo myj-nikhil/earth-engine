@@ -73,3 +73,18 @@ td {
 #longitude {
   margin-left: -15px;
 }
+
+.home-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #0077be;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.home-button a {
+  color: #fff;
+  text-decoration: none;
+}
