@@ -14,7 +14,6 @@ def index():
     return render_template('index.html')
 
 
-<<<<<<< HEAD
 @app.route("/map")
 def map():
     return render_template('map.html')
@@ -23,10 +22,10 @@ def map():
 def coordinates():
     return render_template('coordinates.html')
 
-=======
-# if __name__ == "__main__":
-#     app.run(host="127.0.0.1", port=8080, debug=True)  
->>>>>>> fb8404ee3faebe49e318ea089e132f78e586447d
+@app.route("/coordinates-list")
+def coordinateslist():
+    return render_template('list.html')
+
 
 @app.route("/calculate", methods=['POST'])
 def calculate():
