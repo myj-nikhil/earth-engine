@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earth Engine Web App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main.css') }}">
+  </head>
+<h1>
+  Earth Engine Web App
+</h1>
+  <body>
+    <div class="home-button">
+      <a href="/">Home</a>
+    </div>
+  <form action="result" method="post">
+    <div class="input-container">
+      <label>Latitude:</label>
+      <input type="number" step="0.000001" name="latitude" value= "{{ request.form.latitude }}" required>
+    </div>
+    <div class="input-container">
+      <label id ="longitude">Longitude:</label>
+      <input type="number" step="0.000001" name="longitude" value = "{{ request.form.longitude }}"  required>
+    </div>    
+    <input type="submit" value="Get data">
+    <p> Note: Enter the Latitude and Longitude values in Decimal Degrees</p>
+    <p>The Co-ordinates of Mumbai in Decimal Degrees: : 19.0760 , 72.8777</p>
+  </form>
+</body>
+</html>
