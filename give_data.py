@@ -34,7 +34,7 @@ def given_data(region):
         population_coll = ee.ImageCollection(
             "CIESIN/GPWv411/GPW_Population_Density")  # Temporal Res = 5 years
         # Load the image of Soil Organic Carbon content
-        organic_carbon = ee.Image(
+        soil_image = ee.Image(
             "OpenLandMap/SOL/SOL_ORGANIC-CARBON_USDA-6A1C_M/v02")
         # Load the climate data
         # Temporal Resolution = 1 Month
@@ -59,6 +59,11 @@ def given_data(region):
         climate_scale = int(climate_projection.nominalScale().getInfo())
         print(" \n Climate Scale: ",climate_scale)
 
+        soil_projection = soil_image.projection()
+        print("\n Soil Projection: ",soil_projection.getInfo())
+        soil_scale = int(soil_projection.nominalScale().getInfo())
+        print(" \n Soil Scale: ",soil_scale)
+
 #The below method checks the input and if it is a polygon,gets the length of the sides and takes the median of them and sets the scale of the projection to this median value.
         coords = region.coordinates().getInfo()
         if(len(coords)==1):
@@ -80,6 +85,7 @@ def given_data(region):
             else:
                 median_scale = sides_sorted[n//2]
             climate_scale = median_scale
+            soil_scale = median_scale
             population_scale = median_scale 
             rainfall_scale  = median_scale
             print("The median length of the sides is:", median_scale)
@@ -105,25 +111,29 @@ def given_data(region):
         # For the time duration we can sum, take average etc of the data
         # Here we are taking sum for rainfall data and average for Population and climate data
 
-        rainfall_sum = filtered_coll[2].reduce(ee.Reducer.sum())
-        popul_mean = filtered_coll[0].reduce(ee.Reducer.mean())
-        cli_mean = filtered_coll[1].reduce(ee.Reducer.mean())
+        rainfall_sum = filtered_coll[2].reduce(ee.Reducer.sum()).clip(region)
+        popul_mean = filtered_coll[0].reduce(ee.Reducer.mean()).clip(region)
+        cli_mean = filtered_coll[1].reduce(ee.Reducer.mean()).clip(region)
+        soil_image = soil_image.clip(region)
 
         rainfall_data = rainfall_sum.reduceRegion(
 
             # For given region we are taking the mean value of the pixels to
-            reducer=ee.Reducer.mean(),
             # output the data, again here also we can perform sum
             # or take maximum/minimum values as per our requirement.
+            reducer=ee.Reducer.mean(),
             geometry=region,
             scale=rainfall_scale
 
         ).getInfo()['precipitation_sum']
 
+        
+
         print(rainfall_data)
         
         if rainfall_data is not None:
             rainfall_data = round(rainfall_data)
+            rainfall_data = str(rainfall_data) + " mm"
         # print('rainfall_data', type(rainfall_data))
         else:
             rainfall_data = 'Data is not available'
@@ -136,8 +146,11 @@ def given_data(region):
             bestEffort =True
 
         ).getInfo()['population_density_mean']
+
+        
         if population_density_data is not None:
             population_density_data = round(population_density_data)
+            population_density_data = str(population_density_data) + " per Sq. Km"
         else:
             population_density_data = 'Data is not available'
 
@@ -157,7 +170,12 @@ def given_data(region):
             else:
                 climate_data[key] = 'Data is not available'
 
-        soil_data = organic_carbon.reduceRegion('mean',region).getInfo()
+        soil_data = soil_image.reduceRegion(
+            reducer=ee.Reducer.mean(),
+            geometry=region,
+            scale=soil_scale,
+            bestEffort =True
+        ).getInfo()
 
         for key in soil_data:
             if soil_data[key] is not None:
@@ -167,14 +185,28 @@ def given_data(region):
 
         soilkey_list = ['Soil organic carbon content at 0 cm depth', 'Soil organic carbon content at 10 cm depth', 'Soil organic carbon content at 100 cm depth',
                         'Soil organic carbon content at 200 cm depth', 'Soil organic carbon content at 30 cm depth', 'Soil organic carbon content at 60 cm depth']
-        climatekey_list = ['Evapotranspiration (kg m-2 s-1)', 'Downward longwave radiation flux (W m-2)', 'Net longwave radiation flux (W m-2)', 'Surface pressure (Pa)', 'Specific humidity (1(mass fraction))', 'Soil heat flux (W m-2)', 'Sensible heat net flux (W m-2)', 'Latent heat net flux (W m-2)', 'Storm surface runoff (Kg m-2 s-1)', 'Baseflow-groundwater runoff (Kg m-2 s-1)', 'Surface radiative temperature (K)', 'Total precipitation rate (Kg m-2 s-1)', 'Snow cover fraction', 'Snow depth (m)', 'Snowfall rate (Kg m-2 s-1)', 'Soil moisture (0 - 10 cm underground)',
-                           'Soil moisture (10 - 40 cm underground) (1(volume fraction))', 'Soil moisture (100 - 200 cm underground) (1(volume fraction))', 'Soil moisture (40 - 100 cm underground) (1(volume fraction))', 'Soil temperature (0 - 10 cm underground) (K)', 'Soil temperature (10 - 40 cm underground) (K)', 'Soil temperature (100 - 200 cm underground) (K)', 'Soil temperature (40 - 100 cm underground) (K)', 'Surface downward shortwave radiation (W m-2)', 'Snow water equivalent (Kg m-2)', 'Net shortwave radiation flux (W m-2)', 'Near surface air temperature (K)', 'Near surface wind speed (m/s)']
+        climatekey_list = ['Evapotranspiration ', 'Downward longwave radiation flux ', 'Net longwave radiation flux ', 'Surface pressure', 'Specific humidity', 'Soil heat flux ', 'Sensible heat net flux', 'Latent heat net flux', 'Storm surface runoff', 'Baseflow-groundwater runoff', 'Surface radiative temperature', 'Total precipitation rate', 'Snow cover fraction', 'Snow depth', 'Snowfall rate', 'Soil moisture (0 - 10 cm underground)',
+                           'Soil moisture (10 - 40 cm underground)', 'Soil moisture (100 - 200 cm underground)', 'Soil moisture (40 - 100 cm underground)', 'Soil temperature (0 - 10 cm underground)', 'Soil temperature (10 - 40 cm underground)', 'Soil temperature (100 - 200 cm underground)', 'Soil temperature (40 - 100 cm underground)', 'Surface downward shortwave radiation', 'Snow water equivalent', 'Net shortwave radiation flux', 'Near surface air temperature', 'Near surface wind speed']
+
+        climatevalue_unit_list = ['Kg/㎡/s',  'W/㎡', 'W/㎡', 'Pa', '1(mass fraction)', 'W/㎡', 'W/㎡', 'W/㎡', 'Kg/㎡/s', 'Kg/㎡/s', 'K', 'Kg/㎡/s', '', 'm', 'Kg/㎡/s', '1(volume fraction)',
+                           '1(volume fraction)', '1(volume fraction)', '1(volume fraction)', 'K', 'K', 'K', 'K', 'W/㎡', 'Kg/㎡', 'W/㎡', 'K', 'm/s']
+        climatevalue_list = list(climate_data.values())
+        soilvalue_list = list(soil_data.values())
+
+        new_soil_value_list = []
+        for i in range (len(soilvalue_list)):
+            new_soil_value_list.append(str(soilvalue_list[i])+"%")
+
+        new_climate_valuelist = []
+        for i in range(len(climatevalue_list)):
+            new_climate_valuelist.append(str(climatevalue_list[i])+" "+climatevalue_unit_list[i])  
+        
 
         modified_climate_key_data = dict(
-            zip(climatekey_list, list(climate_data.values())))
+            zip(climatekey_list, new_climate_valuelist))  
 
         modified_soil_key_data = dict(
-            zip(soilkey_list, list(soil_data.values())))
+            zip(soilkey_list, new_soil_value_list))
 
         out_dict = {
             'rainfall': rainfall_data,
