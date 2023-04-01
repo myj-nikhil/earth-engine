@@ -114,6 +114,9 @@ function myfunction() {
 
                 error: function (xhr, status, error) {
                     console.log(error); // Log any errors
+                    const targetArea = document.getElementById("ans");
+                    targetArea.innerHTML = `<p>Please select a smaller area</p>`
+
                 }
             });
         }
