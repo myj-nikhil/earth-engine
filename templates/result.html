@@ -20,16 +20,17 @@
   <form action="result" method="post">
     <div class="input-container">
       <label>Latitude:</label>
-      <input type="number" step="0.000001" name="latitude" value="{{ request.form.latitude }}" required>
+      <input type="number" step="any" name="latitude" value="{{ request.form.latitude }}" required>
     </div>
     <div class="input-container">
       <label id="longitude">Longitude:</label>
-      <input type="number" step="0.000001" name="longitude" value="{{ request.form.longitude }}" required>
+      <input type="number" step="any" name="longitude" value="{{ request.form.longitude }}" required>
     </div>
     <input type="submit" value="Get data">
   </form>
 
   <h3>
+    <!-- Here were chcking the latitude and longitude values from the input and printing the appropriate direction based on the values of lat,long -->
     Values for the Co-ordinates: {{dd_lat}}&#176; {%if dd_lat > 0 %}N {% else %}S{%endif%} , {{dd_long}}&#176; {%if
     dd_long > 0%}E {% else %}W{%endif%}
 
@@ -67,7 +68,7 @@
       {% for key, value in output.get('soil').items() %}
       <tr>
         <td> {{ key }} </td>
-        <td> {{ value }} %</td>
+        <td> {{ value }} </td>
       </tr>
       {% endfor %}
     </tbody>
