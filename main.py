@@ -62,7 +62,7 @@ def ans():
         print(coordinates.getInfo())
         output = given_data(coordinates)
         print(output)
-    return render_template('result.html', output=output, dd_long=dd_long, dd_lat=dd_lat, population=output.get('population'), rainfall=output.get('rainfall'))
+    return render_template('result.html', output=output, dd_long=dd_long, dd_lat=dd_lat, population=output.get('Population'), rainfall=output.get('Rainfall'))
 
 
 if __name__ == "__main__":
