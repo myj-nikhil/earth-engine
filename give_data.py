@@ -195,7 +195,7 @@ def given_data(region):
 
         new_soil_value_list = []
         for i in range (len(soilvalue_list)):
-            new_soil_value_list.append(str(soilvalue_list[i])+"%")
+            new_soil_value_list.append(str(soilvalue_list[i])+" %")
 
         new_climate_valuelist = []
         for i in range(len(climatevalue_list)):
@@ -203,16 +203,16 @@ def given_data(region):
         
 
         modified_climate_key_data = dict(
-            zip(climatekey_list, new_climate_valuelist))  
+            zip(climatekey_list, new_climate_valuelist))
 
         modified_soil_key_data = dict(
             zip(soilkey_list, new_soil_value_list))
 
         out_dict = {
-            'rainfall': rainfall_data,
-            'population': population_density_data,
-            'climate': modified_climate_key_data,
-            'soil': modified_soil_key_data
+            'Rainfall': rainfall_data,
+            'Population': population_density_data,
+            'Climate': modified_climate_key_data,
+            'Soil': modified_soil_key_data
         }
         print(out_dict)
 
