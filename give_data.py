@@ -25,7 +25,7 @@ def given_data(region):
         # district_features = region
 
         # Input year (this can be taken as an inpput from UI)
-        year = '2010'
+        year = '2015'
         print("Showing Data for the year: ", year)
         number = ee.Number(int(year))
 
@@ -42,12 +42,30 @@ def given_data(region):
         # Load the rainfall data
         rainfall_coll = ee.ImageCollection(
             "UCSB-CHG/CHIRPS/DAILY")  # Temporal Resolution = 1 Day
+        
+        #load cloud cover data
+
+        cloud_cover_coll = ee.ImageCollection("COPERNICUS/S2_CLOUD_PROBABILITY") # temporal resolution = 1 Day
+
+        #load temperature data 
+
+        temperature_coll = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE") # temporal resolution = 1 Month
+
+        #Selecting maximum and minimum temperature bands from the collection
+        max_temp_coll = temperature_coll.select('tmmx')
+        min_temp_coll = temperature_coll.select('tmmn')
+
 
         # Get the Scale(Resolution) of the data
         rainfall_projection = rainfall_coll.first().projection()
         print(" \n Rainfall data Projection: ",rainfall_projection.getInfo())
         rainfall_scale = int(rainfall_projection.nominalScale().getInfo())
         print(" \n Rainfall Scale : ",rainfall_scale)
+
+        cloud_cover_projection  = cloud_cover_coll.first().projection()
+        print("\n Cloud Cover Projection: ", cloud_cover_projection.getInfo())
+        cloud_cover_scale = int(cloud_cover_projection.nominalScale().getInfo())
+        print("\n cloud_cover_scale: ", cloud_cover_scale)
         
         population_projection = population_coll.first().projection()
         print("\n Population Projection: ",population_projection.getInfo())
@@ -64,7 +82,13 @@ def given_data(region):
         soil_scale = int(soil_projection.nominalScale().getInfo())
         print(" \n Soil Scale: ",soil_scale)
 
-#The below method checks the input and if it is a polygon,gets the length of the sides and takes the median of them and sets the scale of the projection to this median value.
+        temperature_projection = temperature_coll.first().projection()
+        print("\n Temperature Projection: ",temperature_projection.getInfo())
+        temperature_scale = int(temperature_projection.nominalScale().getInfo())
+        print(" \n Tempearture Scale: ",temperature_scale)
+
+        reducerr = ee.Reducer.first()
+        #The below method checks the input and if it is a polygon,gets the length of the sides and takes the median of them and sets the scale of the projection to this median value.
         coords = region.coordinates().getInfo()
         if(len(coords)==1):
             
@@ -88,13 +112,16 @@ def given_data(region):
             soil_scale = median_scale
             population_scale = median_scale 
             rainfall_scale  = median_scale
+            cloud_cover_scale = median_scale
+            temperature_scale = median_scale
+            reducerr = ee.Reducer.mean()
             print("The median length of the sides is:", median_scale)
 
+        print("Reducer is",reducerr.getInfo())
 
+        all_coll = [population_coll, climate_coll, rainfall_coll,cloud_cover_coll,max_temp_coll,min_temp_coll]
 
-        all_coll = [population_coll, climate_coll, rainfall_coll]
-
-        filtered_coll = [None]*3
+        filtered_coll = [None]*6
 
         # Filtering the collection for a period of one year
 
@@ -111,25 +138,80 @@ def given_data(region):
         # For the time duration we can sum, take average etc of the data
         # Here we are taking sum for rainfall data and average for Population and climate data
 
+        min_temp_mean = filtered_coll[5].reduce(ee.Reducer.min()).clip(region)
+        max_temp_mean = filtered_coll[4].reduce(ee.Reducer.max()).clip(region)
+        cloud_cover_mean = filtered_coll[3].reduce(ee.Reducer.mean()).clip(region)
         rainfall_sum = filtered_coll[2].reduce(ee.Reducer.sum()).clip(region)
-        popul_mean = filtered_coll[0].reduce(ee.Reducer.mean()).clip(region)
         cli_mean = filtered_coll[1].reduce(ee.Reducer.mean()).clip(region)
+        popul_mean = filtered_coll[0].reduce(ee.Reducer.mean()).clip(region)
         soil_image = soil_image.clip(region)
 
+        print("Cloud cover data",cloud_cover_mean.getInfo())
+
+        cloud_cover_data = cloud_cover_mean.reduceRegion(
+            reducer = reducerr,
+            geometry =  region,
+            scale= cloud_cover_scale,
+            bestEffort =True
+        ).getInfo()['probability_mean']
+
+        print("cloud cover",cloud_cover_data)
+        
+        if cloud_cover_data is not None:
+            cloud_cover_data = round(cloud_cover_data)
+            cloud_cover_data = str(cloud_cover_data) + " %"
+        # print('rainfall_data', type(rainfall_data))
+        else:
+            cloud_cover_data = 'Data is not available'
+
+        
+        max_temp_data = max_temp_mean.reduceRegion(
+            reducer = reducerr,
+            geometry =  region,
+            scale= temperature_scale,
+            bestEffort =True
+        ).getInfo()['tmmx_max']
+
+        print("max temp",max_temp_data)
+        
+        if max_temp_data is not None:
+            max_temp_data = round(max_temp_data)
+            max_temp_data = str(round(max_temp_data * 0.1)) + " ℃"
+        # print('rainfall_data', type(rainfall_data))
+        else:
+            max_temp_data = 'Data is not available'
+
+        
+        min_temp_data = min_temp_mean.reduceRegion(
+            reducer = reducerr,
+            geometry =  region,
+            scale= temperature_scale,
+            bestEffort =True
+        ).getInfo()['tmmn_min']
+
+        print("min temp",min_temp_data)
+        
+        if min_temp_data is not None:
+            min_temp_data = round(min_temp_data)
+            min_temp_data = str(round(min_temp_data * 0.1)) + " ℃"
+        # print('rainfall_data', type(rainfall_data))
+        else:
+            min_temp_data = 'Data is not available'
+        
+        
         rainfall_data = rainfall_sum.reduceRegion(
 
             # For given region we are taking the mean value of the pixels to
             # output the data, again here also we can perform sum
             # or take maximum/minimum values as per our requirement.
-            reducer=ee.Reducer.mean(),
+            reducer=reducerr,
             geometry=region,
-            scale=rainfall_scale
+            scale=rainfall_scale,
+            bestEffort =True
+
 
         ).getInfo()['precipitation_sum']
-
-        
-
-        print(rainfall_data)
+        print("rainfall",rainfall_data)
         
         if rainfall_data is not None:
             rainfall_data = round(rainfall_data)
@@ -138,9 +220,11 @@ def given_data(region):
         else:
             rainfall_data = 'Data is not available'
 
+
+
         population_density_data = popul_mean.reduceRegion(
 
-            reducer=ee.Reducer.mean(),
+            reducer=reducerr,
             geometry=region,
             scale=population_scale,
             bestEffort =True
@@ -156,7 +240,7 @@ def given_data(region):
 
         climate_data = cli_mean.reduceRegion(
 
-            reducer=ee.Reducer.mean(),
+            reducer=reducerr,
             geometry=region,
             scale=climate_scale,
             bestEffort =True
@@ -171,7 +255,7 @@ def given_data(region):
                 climate_data[key] = 'Data is not available'
 
         soil_data = soil_image.reduceRegion(
-            reducer=ee.Reducer.mean(),
+            reducer=reducerr,
             geometry=region,
             scale=soil_scale,
             bestEffort =True
@@ -209,10 +293,13 @@ def given_data(region):
             zip(soilkey_list, new_soil_value_list))
 
         out_dict = {
-            'Rainfall': rainfall_data,
+            'Total_Rainfall': rainfall_data,
             'Population': population_density_data,
             'Climate': modified_climate_key_data,
-            'Soil': modified_soil_key_data
+            'Soil': modified_soil_key_data,
+            'Cloud_Cover_Probability': cloud_cover_data,
+            'Maximum_Temperature':max_temp_data,
+            'Minimum_Temperature': min_temp_data
         }
         print(out_dict)
 

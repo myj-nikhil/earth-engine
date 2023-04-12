@@ -30,11 +30,12 @@ map.addControl(
 function myfunction() {
     console.log("button clicked")
     const data = draw.getAll();
-    console.log("length of features", data.features.length)
+    console.log("Data is",data);
+    console.log("length of features : ", data.features.length);
     const targetArea = document.getElementById("ans");
     if (data.features.length > 0) {
         const pointArray = data.features[0].geometry.coordinates[0];
-        console.log(pointArray)
+        console.log("Point array is:",pointArray)
         console.log(pointArray.length)
         if (pointArray.length > 2) {
             console.log(pointArray)
