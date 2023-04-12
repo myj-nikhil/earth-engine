@@ -8,6 +8,7 @@
     />
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type='text/javascript' src="{{ url_for('static',filename='config.js')}}"></script>
     <script>
       ((g) => {
         var h,
@@ -43,7 +44,7 @@
         d[l]
           ? console.warn(p + " only loads once. Ignoring:", g)
           : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
-      })({ key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "beta" });
+      })({ key: config.MAPS_API_KEY, v: "beta" });
     </script>
     <script src="{{ url_for('static', filename='googleMap.js')}}"></script>
     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
