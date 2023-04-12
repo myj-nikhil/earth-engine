@@ -5,6 +5,10 @@ body {
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: large;
+    /* background-color: yellow; */
+    /* background-color: #ffeeb2; */
+    background-color: hsl(47, 100%, 73%);
+
 }
 
 .container {
@@ -28,7 +32,8 @@ body {
 button {
     font-size: 16px;
     padding: 10px;
-    background-color: hsl(325, 72%, 72%);
+    /* background-color: hsl(325, 72%, 72%); */
+    background-color: grey;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -65,7 +70,8 @@ table {
     position: absolute;
     top: 10px;
     left: 10px;
-    background-color: #0077be;
+    /* background-color: #0077be; */
+    background-color: grey;
     color: #fff;
     padding: 10px 20px;
     border-radius: 5px;

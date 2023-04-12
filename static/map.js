@@ -30,11 +30,12 @@ map.addControl(
 function myfunction() {
     console.log("button clicked")
     const data = draw.getAll();
-    console.log("length of features", data.features.length)
+    console.log("Data is",data);
+    console.log("length of features : ", data.features.length);
     const targetArea = document.getElementById("ans");
     if (data.features.length > 0) {
         const pointArray = data.features[0].geometry.coordinates[0];
-        console.log(pointArray)
+        console.log("Point array is:",pointArray)
         console.log(pointArray.length)
         if (pointArray.length > 2) {
             console.log(pointArray)
@@ -42,7 +43,7 @@ function myfunction() {
             const area = turf.area(data);
             const rounded_area = Math.round(area * 100) / 100;
             console.log("Type of request to Python server is ", typeof s)
-            console.log("Doubly JSON Stringified input:", s);
+            console.log("JSON Stringified input:", s);
             targetArea.innerHTML = `<p>Calculating...</p>`
             $.ajax({
                 url: "/calculate",
@@ -114,6 +115,9 @@ function myfunction() {
 
                 error: function (xhr, status, error) {
                     console.log(error); // Log any errors
+                    const targetArea = document.getElementById("ans");
+                    targetArea.innerHTML = `<p>Please select a smaller area</p>`
+
                 }
             });
         }

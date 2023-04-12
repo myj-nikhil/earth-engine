@@ -1,6 +1,9 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 17px;
+  /* background-color: yellow; */
+  background-color: hsl(47, 100%, 73%);
+
 }
 /* Center the form */
 h1 {
@@ -34,9 +37,11 @@ input[type="submit"] {
   margin: 10px;
   border-radius: 5px;
   border: none;
-  background-color: #4CAF50;
+  /* background-color: #4CAF50; */
+  background-color: grey;
   color: white;
   font-weight: bold;
+  cursor: pointer;
 }
 
 /* Style the headings */
@@ -78,13 +83,27 @@ td {
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: #0077be;
+  /* background-color: #0077be; */
+  background-color: grey;
   color: #fff;
   padding: 10px 20px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .home-button a {
   color: #fff;
   text-decoration: none;
 }
+
+a {
+  color: black;
+  text-decoration: none; /* remove underline */
+  font-weight: bold; /* bold text */
+  transition: color 0.2s ease-in-out; /* add smooth color transition on hover */
+}
+
+/* a:hover {
+  color: #ff0000; 
+} */
+
