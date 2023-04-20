@@ -1,7 +1,9 @@
 import ee
-
+from timeit import default_timer as timer
 
 def given_data(region):
+    start = timer()
+    print("\n main code execution started")
     try:
         # Method 1: Defining the region with coordinates obtianed manually ,
         # Mumbai_Coordinates are the boundary coordinates of Mumbai Suburban
@@ -25,8 +27,8 @@ def given_data(region):
         # district_features = region
 
         # Input year (this can be taken as an inpput from UI)
-        year = '2015'
-        print("Showing Data for the year: ", year)
+        year = '2020'
+        # print(" \n Showing Data for the year: ", year)
         number = ee.Number(int(year))
 
         # Load the imagecollection of global population density
@@ -58,41 +60,42 @@ def given_data(region):
 
         # Get the Scale(Resolution) of the data
         rainfall_projection = rainfall_coll.first().projection()
-        print(" \n Rainfall data Projection: ",rainfall_projection.getInfo())
+        # print(" \n Rainfall data Projection: ",rainfall_projection.getInfo())
         rainfall_scale = int(rainfall_projection.nominalScale().getInfo())
-        print(" \n Rainfall Scale : ",rainfall_scale)
+        # print(" \n Rainfall Scale : ",rainfall_scale)
 
         cloud_cover_projection  = cloud_cover_coll.first().projection()
-        print("\n Cloud Cover Projection: ", cloud_cover_projection.getInfo())
+        # print("\n Cloud Cover Projection: ", cloud_cover_projection.getInfo())
         cloud_cover_scale = int(cloud_cover_projection.nominalScale().getInfo())
-        print("\n cloud_cover_scale: ", cloud_cover_scale)
+        # print("\n cloud_cover_scale: ", cloud_cover_scale)
         
         population_projection = population_coll.first().projection()
-        print("\n Population Projection: ",population_projection.getInfo())
+        # print("\n Population Projection: ",population_projection.getInfo())
         population_scale = int(population_projection.nominalScale().getInfo())
-        print("\n Population Scale: ", population_scale)
+        # print("\n Population Scale: ", population_scale)
         
         climate_projection = climate_coll.first().projection()
-        print("\n Climate Projection: ",climate_projection.getInfo())
+        # print("\n Climate Projection: ",climate_projection.getInfo())
         climate_scale = int(climate_projection.nominalScale().getInfo())
-        print(" \n Climate Scale: ",climate_scale)
+        # print(" \n Climate Scale: ",climate_scale)
 
         soil_projection = soil_image.projection()
-        print("\n Soil Projection: ",soil_projection.getInfo())
+        # print("\n Soil Projection: ",soil_projection.getInfo())
         soil_scale = int(soil_projection.nominalScale().getInfo())
-        print(" \n Soil Scale: ",soil_scale)
+        # print(" \n Soil Scale: ",soil_scale)
 
         temperature_projection = temperature_coll.first().projection()
-        print("\n Temperature Projection: ",temperature_projection.getInfo())
+        # print("\n Temperature Projection: ",temperature_projection.getInfo())
         temperature_scale = int(temperature_projection.nominalScale().getInfo())
-        print(" \n Tempearture Scale: ",temperature_scale)
+        # print(" \n Tempearture Scale: ",temperature_scale)
 
         reducerr = ee.Reducer.first()
         #The below method checks the input and if it is a polygon,gets the length of the sides and takes the median of them and sets the scale of the projection to this median value.
         coords = region.coordinates().getInfo()
+        # print("coordinates are",coords)
         if(len(coords)==1):
             
-            print(coords[0])
+            # print(coords[0])
 
             # Get the length of each side of the polygon
             sides = []
@@ -115,9 +118,9 @@ def given_data(region):
             cloud_cover_scale = median_scale
             temperature_scale = median_scale
             reducerr = ee.Reducer.mean()
-            print("The median length of the sides is:", median_scale)
+            # print("The median length of the sides is:", median_scale)
 
-        print("Reducer is",reducerr.getInfo())
+        # print("Reducer is",reducerr.getInfo())
 
         all_coll = [population_coll, climate_coll, rainfall_coll,cloud_cover_coll,max_temp_coll,min_temp_coll]
 
@@ -146,16 +149,16 @@ def given_data(region):
         popul_mean = filtered_coll[0].reduce(ee.Reducer.mean()).clip(region)
         soil_image = soil_image.clip(region)
 
-        print("Cloud cover data",cloud_cover_mean.getInfo())
+        # print("Cloud cover data",cloud_cover_mean.getInfo())
 
         cloud_cover_data = cloud_cover_mean.reduceRegion(
             reducer = reducerr,
             geometry =  region,
             scale= cloud_cover_scale,
-            bestEffort =True
+            # bestEffort =True
         ).getInfo()['probability_mean']
 
-        print("cloud cover",cloud_cover_data)
+        # print("cloud cover",cloud_cover_data)
         
         if cloud_cover_data is not None:
             cloud_cover_data = round(cloud_cover_data)
@@ -169,10 +172,10 @@ def given_data(region):
             reducer = reducerr,
             geometry =  region,
             scale= temperature_scale,
-            bestEffort =True
+            # bestEffort =True
         ).getInfo()['tmmx_max']
 
-        print("max temp",max_temp_data)
+        # print("max temp",max_temp_data)
         
         if max_temp_data is not None:
             max_temp_data = round(max_temp_data)
@@ -186,10 +189,10 @@ def given_data(region):
             reducer = reducerr,
             geometry =  region,
             scale= temperature_scale,
-            bestEffort =True
+            # bestEffort =True
         ).getInfo()['tmmn_min']
 
-        print("min temp",min_temp_data)
+        # print("min temp",min_temp_data)
         
         if min_temp_data is not None:
             min_temp_data = round(min_temp_data)
@@ -207,15 +210,15 @@ def given_data(region):
             reducer=reducerr,
             geometry=region,
             scale=rainfall_scale,
-            bestEffort =True
+            # bestEffort =True
 
 
         ).getInfo()['precipitation_sum']
-        print("rainfall",rainfall_data)
+        # print("rainfall",rainfall_data)
         
         if rainfall_data is not None:
             rainfall_data = round(rainfall_data)
-            rainfall_data = str(rainfall_data) + " mm"
+            rainfall_data = str(rainfall_data) + " mm per year"
         # print('rainfall_data', type(rainfall_data))
         else:
             rainfall_data = 'Data is not available'
@@ -227,7 +230,7 @@ def given_data(region):
             reducer=reducerr,
             geometry=region,
             scale=population_scale,
-            bestEffort =True
+            # bestEffort =True
 
         ).getInfo()['population_density_mean']
 
@@ -243,14 +246,13 @@ def given_data(region):
             reducer=reducerr,
             geometry=region,
             scale=climate_scale,
-            bestEffort =True
+            # bestEffort =True
 
 
         ).getInfo()
         for key in climate_data:
             if climate_data[key] is not None:
                 climate_data[key] = round(climate_data[key], 5)
-                print(key)
             else:
                 climate_data[key] = 'Data is not available'
 
@@ -258,24 +260,29 @@ def given_data(region):
             reducer=reducerr,
             geometry=region,
             scale=soil_scale,
-            bestEffort =True
+            # bestEffort =True
         ).getInfo()
 
         for key in soil_data:
             if soil_data[key] is not None:
-                soil_data[key] = round(soil_data[key]/2)
+                soil_data[key] = round(soil_data[key]/2,3)
             else:
                 soil_data[key] = 'Data is not available'
 
-        soilkey_list = ['Soil organic carbon content at 0 cm depth', 'Soil organic carbon content at 10 cm depth', 'Soil organic carbon content at 100 cm depth',
-                        'Soil organic carbon content at 200 cm depth', 'Soil organic carbon content at 30 cm depth', 'Soil organic carbon content at 60 cm depth']
-        climatekey_list = ['Evapotranspiration ', 'Downward longwave radiation flux ', 'Net longwave radiation flux ', 'Surface pressure', 'Specific humidity', 'Soil heat flux ', 'Sensible heat net flux', 'Latent heat net flux', 'Storm surface runoff', 'Baseflow-groundwater runoff', 'Surface radiative temperature', 'Total precipitation rate', 'Snow cover fraction', 'Snow depth', 'Snowfall rate', 'Soil moisture (0 - 10 cm underground)',
-                           'Soil moisture (10 - 40 cm underground)', 'Soil moisture (100 - 200 cm underground)', 'Soil moisture (40 - 100 cm underground)', 'Soil temperature (0 - 10 cm underground)', 'Soil temperature (10 - 40 cm underground)', 'Soil temperature (100 - 200 cm underground)', 'Soil temperature (40 - 100 cm underground)', 'Surface downward shortwave radiation', 'Snow water equivalent', 'Net shortwave radiation flux', 'Near surface air temperature', 'Near surface wind speed']
+        # print(soil_data)
 
-        climatevalue_unit_list = ['Kg/㎡/s',  'W/㎡', 'W/㎡', 'Pa', '1(mass fraction)', 'W/㎡', 'W/㎡', 'W/㎡', 'Kg/㎡/s', 'Kg/㎡/s', 'K', 'Kg/㎡/s', '', 'm', 'Kg/㎡/s', '1(volume fraction)',
-                           '1(volume fraction)', '1(volume fraction)', '1(volume fraction)', 'K', 'K', 'K', 'K', 'W/㎡', 'Kg/㎡', 'W/㎡', 'K', 'm/s']
-        climatevalue_list = list(climate_data.values())
-        soilvalue_list = list(soil_data.values())
+        soilkey_list = ['Soil organic carbon content at 0 cm depth', 'Soil organic carbon content at 10 cm depth', 'Soil organic carbon content at 30 cm depth',
+                        'Soil organic carbon content at 60 cm depth', 'Soil organic carbon content at 100 cm depth', 'Soil organic carbon content at 200 cm depth']
+        climatekey_list = ['Evapotranspiration ', 'Downward longwave radiation flux ', 'Net longwave radiation flux ', 'Surface pressure', 'Specific humidity', 'Soil heat flux ', 'Sensible heat net flux', 'Latent heat net flux', 'Storm surface runoff', 'Baseflow-groundwater runoff', 'Surface radiative temperature', 'Total precipitation rate', 'Snow cover fraction', 'Snow depth', 'Snowfall rate', 'Soil moisture (0 - 10 cm underground)',
+                           'Soil moisture (10 - 40 cm underground)', 'Soil moisture (40 - 100 cm underground)', 'Soil moisture (100 - 200 cm underground)', 'Soil temperature (0 - 10 cm underground)', 'Soil temperature (10 - 40 cm underground)', 'Soil temperature (40 - 100 cm underground)', 'Soil temperature (100 - 200 cm underground)', 'Surface downward shortwave radiation', 'Snow water equivalent', 'Net shortwave radiation flux', 'Near surface air temperature', 'Near surface wind speed']
+        # climatevalue_unit_list = ['Kg/㎡/s',  'W/㎡', 'W/㎡', 'Pa', '1(mass fraction)', 'W/㎡', 'W/㎡', 'W/㎡', 'Kg/㎡/s', 'Kg/㎡/s', 'K', 'Kg/㎡/s', '', 'm', 'Kg/㎡/s', '1(volume fraction)',
+        #                    '1(volume fraction)', '1(volume fraction)', '1(volume fraction)', 'K', 'K', 'K', 'K', 'W/㎡', 'Kg/㎡', 'W/㎡', 'K', 'm/s']
+
+
+        climatevalue_unit_list = ['Kg/m*m/s',  'W/m*m', 'W/m*m', 'Pa', '1(mass fraction)', 'W/m*m', 'W/m*m', 'W/m*m', 'Kg/m*m/s', 'Kg/m*m/s', 'K', 'Kg/m*m/s', '', 'm', 'Kg/m*m/s', '1(volume fraction)',
+                           '1(volume fraction)', '1(volume fraction)', '1(volume fraction)', 'K', 'K', 'K', 'K', 'W/m*m', 'Kg/m*m/s', 'W/m*m', 'K', 'm/s']
+        climatevalue_list = [climate_data['Evap_tavg_mean'],climate_data['LWdown_f_tavg_mean'],climate_data['Lwnet_tavg_mean'],climate_data['Psurf_f_tavg_mean'],climate_data['Qair_f_tavg_mean'],climate_data['Qg_tavg_mean'],climate_data['Qh_tavg_mean'],climate_data['Qle_tavg_mean'],climate_data['Qs_tavg_mean'],climate_data['Qsb_tavg_mean'],climate_data['RadT_tavg_mean'],climate_data['Rainf_f_tavg_mean'],climate_data['SnowCover_inst_mean'],climate_data['SnowDepth_inst_mean'],climate_data['Snowf_tavg_mean'],climate_data['SoilMoi00_10cm_tavg_mean'],climate_data['SoilMoi10_40cm_tavg_mean'],climate_data['SoilMoi40_100cm_tavg_mean'],climate_data['SoilMoi100_200cm_tavg_mean'],climate_data['SoilTemp00_10cm_tavg_mean'],climate_data['SoilTemp10_40cm_tavg_mean'],climate_data['SoilTemp40_100cm_tavg_mean'],climate_data['SoilTemp100_200cm_tavg_mean'],climate_data['SWdown_f_tavg_mean'],climate_data['SWE_inst_mean'],climate_data['Swnet_tavg_mean'],climate_data['Tair_f_tavg_mean'],climate_data['Wind_f_tavg_mean']]
+        soilvalue_list = [soil_data['b0'],soil_data['b10'],soil_data['b30'],soil_data['b60'],soil_data['b100'],soil_data['b200']]
 
         new_soil_value_list = []
         for i in range (len(soilvalue_list)):
@@ -291,18 +298,19 @@ def given_data(region):
 
         modified_soil_key_data = dict(
             zip(soilkey_list, new_soil_value_list))
-
+        
         out_dict = {
-            'Total_Rainfall': rainfall_data,
-            'Population': population_density_data,
             'Climate': modified_climate_key_data,
+            'Cloud': {'Cloud Cover Probability':cloud_cover_data},
+            'Temperature': {'Maximum Temperature':max_temp_data,'Minimum Temperature': min_temp_data},
+            'Population': {'Population': population_density_data},
             'Soil': modified_soil_key_data,
-            'Cloud_Cover_Probability': cloud_cover_data,
-            'Maximum_Temperature':max_temp_data,
-            'Minimum_Temperature': min_temp_data
+            'Rainfall':{'Total Rainfall': rainfall_data,},
         }
-        print(out_dict)
-
+        # print(out_dict)
+        print("execution done")
+        end = timer()
+        print("\n ", round(end-start,5))
         return (out_dict)
 
     except ValueError:
