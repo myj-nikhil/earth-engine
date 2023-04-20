@@ -5,6 +5,7 @@ from give_data import given_data
 import ee
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False # This usage is warned in flask documentation
 
 # Home page of the App
 
@@ -13,14 +14,10 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route("/googlemap")
-def googlemap():
-    return render_template('csstest.html')
-
 # This is the page of the app where the user can get data of an area by selecting the area on the map
 @app.route("/map")
 def map():
-    return render_template('googleMaptest.html')
+    return render_template('new-google-map.html')
 
 # This is the page of the app where the user can input coordinates and get data at that coordinates
 @app.route("/coordinates")
@@ -34,7 +31,11 @@ def diagonalcoordinates():
 
 @app.route("/oldmap")
 def aa():
-    return render_template('map.html')
+    return render_template('old-map.html')
+
+@app.route("/oldway")
+def neway():
+    return render_template('old-coordinates.html')
 
 
 # This function takes in user input(boundary coordinates) and returns a JSON object with the calculated data
@@ -42,35 +43,25 @@ def aa():
 @app.route("/calculate", methods=['POST'])
 def calculate():
     initialise() # Initialize the Earth Engine API
-    output = request.get_json()
-    print("Request arg type: ", type(output))
-    print(output)
-    result = json.loads(output) # Load the JSON input into a Python object
-    print("JSON loaded input: ", type(result))
-    print("After JSON loads: ", result)
+    input = request.get_json()
+    print("Request arg type: ", type(input))
+    print(input)
+    result = json.loads(input) # Load the JSON input into a Python object
+    print("\n Type of input: ", type(result))
+    print("\n Input: ", result)
+    print("\n length of input: ",len(result))
     print(result[0])
-    region = ee.Geometry.Polygon(result) # Create a region object from the input coordinates
+    inputlength = len(result)
+    #Check whether the input is apoint or a polygon
+    if(inputlength > 2):
+        region = ee.Geometry.Polygon(result)
+        print("Input region is polygon")
+    else: 
+        region = ee.Geometry.Point(result)
+        print("Input region is a Point")
     ans = given_data(region) # Calculate the data for the region using the Earth Engine API
     # print("In calculate method :")
     return jsonify(ans)  # Return a JSON object instead of a JSON string
 
-
-# This route takes the latitude and longitude values from the form and outputs the values at that location
-@app.route("/result", methods=['POST'])
-def ans():
-    print('submit button clicked')
-    initialise()
-    if request.method == 'POST':
-        print("post inititated")
-        dd_long = float(request.form['longitude'])
-        dd_lat = float(request.form['latitude'])
-        print(dd_lat, dd_long)
-        coordinates = ee.Geometry.Point([float(dd_long), float(dd_lat)])
-        print(coordinates.getInfo())
-        output = given_data(coordinates)
-        print(output)
-    return render_template('result.html', output=output, dd_long=dd_long, dd_lat=dd_lat, population=output.get('Population'), rainfall=output.get('Total_Rainfall'),cloud= output.get('Cloud_Cover_Probability'), max_temp = output.get('Maximum_Temperature'),min_temp = output.get('Minimum_Temperature'))
-
-
 if __name__ == "__main__":
-    app.run(host="127.0.0.1",port=8080, debug=True)
+    app.run(host="127.0.0.1",port=5000, debug=True)
