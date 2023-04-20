@@ -2,7 +2,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 17px;
   /* background-color: yellow; */
-  background-color: hsl(47, 100%, 73%);
+  background-color: hsl(46, 100%, 80%);
 
 }
 /* Center the form */
@@ -96,12 +96,6 @@ td {
   text-decoration: none;
 }
 
-a {
-  color: black;
-  text-decoration: none; /* remove underline */
-  font-weight: bold; /* bold text */
-  transition: color 0.2s ease-in-out; /* add smooth color transition on hover */
-}
 
 /* a:hover {
   color: #ff0000; 
