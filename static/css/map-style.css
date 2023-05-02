@@ -13,13 +13,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex-basis: 800px;
+  flex-basis: 47vw;
   /* change this value to adjust the width of the column */
   height: 100%;
 }
 
 button {
   font-size: 16px;
+  margin-top: 10px;
   padding: 10px;
   /* background-color: hsl(325, 72%, 72%); */
   background-color: grey;
@@ -41,6 +42,10 @@ table {
 
 #map {
   height: 100%;
+}
+
+#hoverelement:hover #rainfall-table {
+  right: 41px;
 }
 
 #description {
