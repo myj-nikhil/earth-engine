@@ -48,3 +48,43 @@ td table td {
   padding: 0;
 }
 
+#rainfall-table {
+  display: none;
+  border-spacing: 10px;
+}
+
+#hoverelement:hover #rainfall-table {
+   display:block;
+   align-self: center;
+   position: absolute;
+  background-color: white;
+  border: 1px solid black;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-width: 100%;
+  z-index: 1;
+  max-width: 240px;
+}
+
+#rainfall-table td {
+  padding-top: 5px;
+  padding-right: 10px;
+}
+
+#Total\ Rainfallval{
+  display: flex
+}
+
+#hoverelement {
+  margin-top:0px;
+  margin-left:7px;
+}
+#rainfall-table td {
+  padding-top: 5px;
+  padding-right: 10px;
+}
+
+#Total\ Rainfallval{
+  display: flex
+}
