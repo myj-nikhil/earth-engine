@@ -156,15 +156,22 @@ else {
     targetArea.innerHTML = 'Please select atleast 3 points'
 }
 
-
-  // if (coordinates.length > 0) {
-  //     const coordinates = data;
-  //     console.log(`Point array : ${coordinates}`)
-  //     console.log(`Point array's length : ${coordinates.length}`)
-  //     //old code here
-  // }
-  // else {
-  //     console.log("feature length", data.length)
-  //     targetArea.innerHTML = 'Please select atleast 3 points'
-  // }
 }
+
+// function mySecondfunction() {
+//   console.log("button clicked")
+//   const targetArea = document.getElementById("ans");
+//   if (coordinates.length > 3) {
+//     console.log(coordinates)
+//     const s = JSON.stringify(coordinates);
+//     let turfPolygon = turf.polygon([coordinates]);
+//     let area = turf.area(turfPolygon);
+//     console.log(`Area of the polygon is ${area}`)
+//     const roundedArea = Math.round(area * 100) / 100;
+//     secondajaxPost(coordinates,targetArea,true,roundedArea);
+// }
+// else {
+//     targetArea.innerHTML = 'Please select atleast 3 points'
+// }
+
+// }
