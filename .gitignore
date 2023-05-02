@@ -2,6 +2,11 @@
 dulcet-order-380816-c70b6f72a2bc.json
 static/config.js
 testenv/
+#testing files
+paralleltest.py
+processpooltest.py
+testing.py
+
 *.json
 # Byte-compiled / optimized / DLL files
 __pycache__/

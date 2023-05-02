@@ -16,6 +16,20 @@ async function initMap() {
     ajaxPost(reversedArray,targetArea,false);
   });
 
+  // document.getElementById("submit2").addEventListener("click", () => {
+  //   const textArea = document.getElementById("textdiv");
+  //   textArea.innerHTML = "";
+  //   const coords = document.getElementById("latlng").value;
+  //   const coordsArray = coords.split(",", 2);
+  //   for (i = 0; i < 2; i++) {
+  //     coordsArray[i] = parseFloat(coordsArray[i]);
+  //   }
+  //   geocodeLatLng(geocoder, coordsArray);
+  //   reversedArray = coordsArray.reverse();
+  //   targetArea = document.getElementById("secondans");
+  //   secondajaxPost(reversedArray,targetArea,false);
+  // });
+
   function geocodeLatLng(geocoder, coordsArray) {
     const latlng = {
       lat: coordsArray[0],
