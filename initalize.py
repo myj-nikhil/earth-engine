@@ -1,13 +1,17 @@
 import ee
+from timeit import default_timer as timer
 
 # This function authenticates and initialises the google earth engine.
 ## Warning : ** Please keep the privatekey file safe and make sure you do not upload 
 # #your private key to the any cloud repository to avoid misuse of google cloud resources. **
 
 def initialise():
+    start = timer()
     # Add the service account mail ID from Google Cloud
     service_account = 'project-xyz@project-xyz-383203.iam.gserviceaccount.com'
     # Give the location of the privatekey file of the service account
     credentials = ee.ServiceAccountCredentials(
         service_account, 'project-xyz-383203.json')
     ee.Initialize(credentials)
+    end = timer()
+    print("Time for initialisation : ", end-start)
