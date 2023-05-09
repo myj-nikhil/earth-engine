@@ -2,6 +2,18 @@ import ee
 from timeit import default_timer as timer
 import concurrent.futures
 import cProfile
+import logging
+
+app_logger = logging.getLogger('v2_parallel.py')
+app_logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('app.log', mode='a')
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+file_handler.setFormatter(formatter)
+
+app_logger.addHandler(file_handler)
 
 # start1 = timer()
 # # Add the service account mail ID from Google Cloud
@@ -11,7 +23,7 @@ import cProfile
 #     service_account, 'project-xyz-383203.json')
 # ee.Initialize(credentials)
 # end1 = timer()
-# print("Time for initialisation : ", end1-start1)
+# app_logger.info("Time for initialisation : ", end1-start1)
 
 
 def population(population_image,region,centroid):
@@ -26,8 +38,8 @@ def population(population_image,region,centroid):
             else:
                 population_density_data = 'Data is not available'
             end = timer()
-            print("time for population : ",round(end-start,5))    
-            # print("PPD :", population_density_data)
+            app_logger.info("time for population : %s",round(end-start,5))    
+            # app_logger.info("PPD :", population_density_data)
             return population_density_data
 
 def organic_soil(soil_image,region,centroid):
@@ -35,14 +47,14 @@ def organic_soil(soil_image,region,centroid):
 
     is_larger = soil_image.reduceRegion(ee.Reducer.count(),region).get('b0')
 
-    print("time for is_larger : ",round(timer()-start,5))
+    app_logger.info("time for is_larger : %s ",round(timer()-start,5))
 
 
-    # print("islarger",is_larger)
+    # app_logger.info("islarger",is_larger)
     
     roi = ee.Algorithms.If(is_larger, region, centroid)
 
-    print("time for reg check : ",round(timer()-start,5))
+    app_logger.info("time for reg check : %s ",round(timer()-start,5))
     
     soil_data = soil_image.reduceRegion(ee.Reducer.mean(),roi).getInfo()
     
@@ -52,7 +64,7 @@ def organic_soil(soil_image,region,centroid):
         else:
             soil_data[key] = 'Data is not available'
 
-    # print(soil_data)
+    # app_logger.info(soil_data)
 
     soilkey_list = ['Soil organic carbon content at 0 cm depth', 'Soil organic carbon content at 10 cm depth', 'Soil organic carbon content at 30 cm depth',
                 'Soil organic carbon content at 60 cm depth', 'Soil organic carbon content at 100 cm depth', 'Soil organic carbon content at 200 cm depth']
@@ -64,8 +76,8 @@ def organic_soil(soil_image,region,centroid):
     modified_soil_data = dict(
         zip(soilkey_list, new_soil_value_list))
     end = timer()
-    print("Time taken for organic_carbon : ",round(end-start,5))
-    # print("Soil Data: ", modified_soil_data)
+    app_logger.info("Time taken for organic_carbon : %s ",round(end-start,5))
+    # app_logger.info("Soil Data: ", modified_soil_data)
     return modified_soil_data
 
 def sand_fraction(sand_fraction_image,region,centroid):
@@ -87,7 +99,7 @@ def sand_fraction(sand_fraction_image,region,centroid):
     
     modified_sand_fraction_data = dict(zip(sand_fraction_key_list,sand_fraction_value_list))
     end = timer()
-    print("TIme taken for sand_fraction : ",round(end-start,5))
+    app_logger.info("TIme taken for sand_fraction : %s ",round(end-start,5))
     return modified_sand_fraction_data
 
 def soil_bulk_density(soil_bulk_density_image,region,centroid):
@@ -106,7 +118,7 @@ def soil_bulk_density(soil_bulk_density_image,region,centroid):
                 else : soil_bulk_density_value_list[i] = '{:.3f}'.format(round(soil_bulk_density_value_list[i],3))+" (10 x kg / m-cubic)"
             modified_soil_bulk_density_data = dict(zip(soil_bulk_density_key_list,soil_bulk_density_value_list))
             end = timer()
-            print("Time taken for soil_bulk_density : ",round(end-start,5))
+            app_logger.info("Time taken for soil_bulk_density : %s ",round(end-start,5))
             return modified_soil_bulk_density_data
 
 def soil_ph(soil_ph_image,region,centroid):
@@ -122,7 +134,7 @@ def soil_ph(soil_ph_image,region,centroid):
         else : soil_ph_value_list[i]='{:.3f}'.format(round(soil_ph_value_list[i]/10,3))
     modified_soil_ph_data = dict(zip(soil_ph_key_list,soil_ph_value_list))
     end = timer()
-    print("Time for soil_pH : ",round(end-start,5))
+    app_logger.info("Time for soil_pH : %s ",round(end-start,5))
     return modified_soil_ph_data
 
 def soil_water_content(soil_water_content_image,region,centroid):
@@ -140,7 +152,7 @@ def soil_water_content(soil_water_content_image,region,centroid):
     
     modified_soil_water_content_data = dict(zip(soil_water_content_key_list,soil_water_content_value_list))
     end = timer()
-    print("Time for soil_water_content : ",round(end-start,5))
+    app_logger.info("Time for soil_water_content : %s ",round(end-start,5))
 
     return modified_soil_water_content_data 
 
@@ -175,7 +187,7 @@ def soil_texture(soil_texture_class_image,region,centroid):
     modified_soil_texture_class_data = dict(zip(soil_texture_class_key_list, soil_texture_class_value_list))
 
     end = timer()
-    print("Time taken for soil_texture : ",round(end-start,5))
+    app_logger.info("Time taken for soil_texture : %s ",round(end-start,5))
     return modified_soil_texture_class_data
         
 
@@ -184,7 +196,7 @@ def soil_great_group(soil_great_group_image,region,centroid):
     is_larger = soil_great_group_image.reduceRegion(ee.Reducer.count(),region).get('grtgroup')
     roi = ee.Algorithms.If(is_larger, region, centroid)
     soil_great_group_data = soil_great_group_image.reduceRegion(ee.Reducer.mode(),roi).getInfo()['grtgroup']
-    print("soil_great_group_data: ",soil_great_group_data)
+    app_logger.info("soil_great_group_data: %s ",soil_great_group_data)
     soil_great_group_value_ref_list = [
             [0, "ffffff", "NODATA"],
             [1, "adff2d", "Albaqualfs"],
@@ -444,11 +456,11 @@ def soil_great_group(soil_great_group_image,region,centroid):
         soil_group = soil_great_group_data
         for item in soil_great_group_value_ref_list:
             if item[0] == soil_great_group_data :
-                # print(item)
+                # app_logger.info(item)
                 soil_group = item[2]
     else : soil_group = 'Data is not available'
     end = timer()
-    print("Time for soil_group : ", round(end-start,5))
+    app_logger.info("Time for soil_group :  %s ", round(end-start,5))
     
     return soil_group
 
@@ -476,7 +488,7 @@ def climate(climate_image,region,centroid):
     modified_climate_data = dict(zip(climatekey_list, new_climate_valuelist))   
 
     end = timer()   
-    print("Time taken for climate : ", round(end-start,5))
+    app_logger.info("Time taken for climate : %s ", round(end-start,5))
 
     return modified_climate_data
 
@@ -527,14 +539,15 @@ def rainfall(filtered_rainfall_coll,rainfall_yearly_image,region,centroid):
     monthly_averages = getMonthlyAverages(filtered_rainfall_coll)
     rounded_values = []
     for value in monthly_averages:
-        rounded_value = "{:.3f}".format(value)
-        rounded_values.append(rounded_value)
-    output = [value + " mm" for value in rounded_values]
+        if value is not None:
+            rounded_value = "{:.3f}".format(value)
+            rounded_values.append(rounded_value)
+    output = [value + " mm" if value is not None else None for value in rounded_values]
     month_list = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     rainfall_sum_monthly  = dict(zip(month_list,output))
    
     end = timer()
-    print("Time taken for rainfall : ", round(end-start,5))
+    app_logger.info("Time taken for rainfall : %s ", round(end-start,5))
 
     return [rainfall_sum_monthly,rainfall_sum_yearly]
 
@@ -544,18 +557,18 @@ def cloud(cloud_image,region,centroid):
     scale  = 10
     new_cloud_image = cloud_image.clip(region)
     is_larger = new_cloud_image.reduceRegion(reducer= ee.Reducer.count(),geometry = region,scale=scale).get('probability_mean')
-    # print("is_larger in cloud : ",is_larger)
-    # print("time for islarger in cloud : ",round(timer()-start,5))
+    # app_logger.info("is_larger in cloud : ",is_larger)
+    # app_logger.info("time for islarger in cloud : ",round(timer()-start,5))
     roi = ee.Algorithms.If(is_larger, region, centroid)
     cloud_cover_data = new_cloud_image.reduceRegion(reducer= ee.Reducer.mean(),geometry = roi,scale=scale).getInfo()['probability_mean']
-    # print(cloud_cover_data)
+    # app_logger.info(cloud_cover_data)
     if cloud_cover_data is not None:
         cloud_cover_data = round(cloud_cover_data,2)
         cloud_cover_data = str(cloud_cover_data) + " %"
     else:
         cloud_cover_data = 'Data is not available'
     end = timer()
-    print("Time taken for cloud : ", round(end-start,5))
+    app_logger.info("Time taken for cloud : %s ", round(end-start,5))
 
     return cloud_cover_data
 
@@ -571,7 +584,7 @@ def max_temp(max_temp_image,region,centroid):
     else:
         max_temp_data = 'Data is not available'
     end = timer()
-    print("Time for max_temp : ",round(end-start,5))
+    app_logger.info("Time for max_temp : %s ",round(end-start,5))
 
     return max_temp_data
 
@@ -599,9 +612,9 @@ def min_temp(min_temp_image,region,centroid):
     else:
         min_temp_data = 'Data is not available'
 
-    # End the timer and print the time elapsed and the minimum temperature value
+    # End the timer and app_logger.info the time elapsed and the minimum temperature value
     end = timer()
-    print(f"Time for min_temp: {round(end-start,5)}")
+    app_logger.info(f"Time for min_temp: {round(end-start,5)}")
 
     return min_temp_data 
 
@@ -613,13 +626,13 @@ def v2_parallel_point(region):
         # pr = cProfile.Profile()
         # pr.enable()
         start = timer()
-        # print("\n main code execution started")
+        # app_logger.info("\n main code execution started")
         year = '2020'
         # dd_long = 83.395551
         # dd_lat = 18.106658
         # #region = ee.Geometry.Polygon([[70.57762138834659,28.43379607099714],[70.57762138834659,28.43330075366702],[70.57898395052615,28.433296036347983],[70.57899467936221,28.433852678544397],[70.57762138834659,28.43386211313265],[70.57762138834659,28.43379607099714]])
         # #region = ee.Geometry.Point([dd_long,dd_lat])
-        # print(" \n Showing Data for the year: ", year)
+        # app_logger.info(" \n Showing Data for the year: ", year)
 
         # Load the imagecollection of global population density
 
@@ -670,9 +683,9 @@ def v2_parallel_point(region):
 
         temperature_coll = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE") # temporal resolution = 1 Month
         temperature_projection = temperature_coll.first().projection()
-        # print("\n Temperature Projection: ",temperature_projection.getInfo())
+        # app_logger.info("\n Temperature Projection: ",temperature_projection.getInfo())
         temperature_scale = temperature_projection.nominalScale().getInfo()
-        # print(" \n Tempearture Scale: ",temperature_scale)
+        # app_logger.info(" \n Tempearture Scale: ",temperature_scale)
 
         filtered_temp_collection = temperature_coll.filterDate(str(year)+'-01-01', str(year)+'-12-31')
 
@@ -693,50 +706,50 @@ def v2_parallel_point(region):
             
         #     if isinstance(input, ee.image.Image):
         #             image = input
-        #             # print("\n The input is an Image.")
+        #             # app_logger.info("\n The input is an Image.")
         #             projection = image.projection()
         #             scale = projection.nominalScale().getInfo()
-        #             # print("\n Scale: ", scale)
+        #             # app_logger.info("\n Scale: ", scale)
 
         #     elif isinstance(input, ee.imagecollection.ImageCollection):
-        #             # print("\n The input is an ImageCollection.")
+        #             # app_logger.info("\n The input is an ImageCollection.")
         #             image_collection  = input
         #             projection = image_collection.first().projection()
-        #             # print("\n  Projection: ",projection.getInfo())
+        #             # app_logger.info("\n  Projection: ",projection.getInfo())
                     
         #             scale = projection.nominalScale().getInfo()
-        #             # print("\n  Scale: ", scale)
+        #             # app_logger.info("\n  Scale: ", scale)
                     
         #             # Filter the image collection for the given year
         #             filtered_collection = image_collection.filterDate(str(year)+'-01-01', str(year)+'-12-31')
 
         #             # Reduce the image collection to a single image using mean()
         #             image = filtered_collection.reduce(reducer=timereducer)
-        #     # else:   print("The input is neither an Image nor an ImageCollection.")
+        #     # else:   app_logger.info("The input is neither an Image nor an ImageCollection.")
             
         #     # Check if the region is a point or a polygon
         #     if region.type().getInfo() == 'Point':
         #         # If the region is a point, use reducer.first() at original scale of the image
-        #         # print("\n Region is a Point")
+        #         # app_logger.info("\n Region is a Point")
         #         value = image.reduceRegion(ee.Reducer.first(), region, scale).getInfo()
 
         #     else:
         #         # If the region is a polygon, check if the region is larger than an pixel at original resolution of image
-        #         # print("\n Region is a Polygon")
+        #         # app_logger.info("\n Region is a Polygon")
         #         first_band = image.select(0)
         #         band_name = first_band.bandNames().getInfo()
         #         is_larger = image.reduceRegion(ee.Reducer.anyNonZero(), region, scale).getInfo()[band_name[0]]
                 
-        #         # print("\n is larger",is_larger)
+        #         # app_logger.info("\n is larger",is_larger)
 
         #         if is_larger:
-        #             # print("region is larger than original pixel")
-        #             # print(band_name[0])
+        #             # app_logger.info("region is larger than original pixel")
+        #             # app_logger.info(band_name[0])
         #             # If the region is larger than an pixel at original resolution of image, use reducer.mean() at original scale of the image
         #             value = image.reduceRegion(reducer=spacereducer, geometry = region, scale=scale).getInfo()
         #         else:
         #             # If the region is smaller than an pixel at original resolution of image, take the centroid of region and output using reducer.first() at original scale of the image
-        #             # print("\n region is smaller than the original pixel")
+        #             # app_logger.info("\n region is smaller than the original pixel")
         #             centroid = region.centroid()
         #             value = image.reduceRegion(ee.Reducer.first(), centroid, scale).getInfo()
                     
@@ -759,25 +772,25 @@ def v2_parallel_point(region):
             future12 = executor.submit(max_temp,max_temp_image,region,centroid)
             future13 = executor.submit(min_temp,min_temp_image,region,centroid)
 
-            # print(future1)
-            # print(future2)
+            # app_logger.info(future1)
+            # app_logger.info(future2)
             # try:
-            #     print(future2.result())
+            #     app_logger.info(future2.result())
             # except Exception:
-            #     traceback.print_exc()
+            #     traceback.app_logger.info_exc()
 
-            # print(future9)
+            # app_logger.info(future9)
             # try:
-            #     print(future9.result())
+            #     app_logger.info(future9.result())
             # except Exception:
-            #     traceback.print_exc()
+            #     traceback.app_logger.info_exc()
 
         wait = timer()
-        print("Time elapesed until before wait line : ",round(wait-start,5))
+        app_logger.info("Time elapesed until before wait line : %s ",round(wait-start,5))
 
         concurrent.futures.wait([future1,future2 ,future3,future4,future5,future6,future7,future8,future9,future10,future11,future12,future13])
 
-        print("Time elapesed until after wait line : ",round(timer()-wait,5))
+        app_logger.info("Time elapesed until after wait line : %s ",round(timer()-wait,5))
 
         out_dict = {
             'Climate': future1.result(),
@@ -794,25 +807,26 @@ def v2_parallel_point(region):
             'Soil Great Group': {"Soil Great Group":future8.result()}, 
             'monthly_rainfall': future10.result()[0]  
         }
-        # print("execution done")
+        # app_logger.info("execution done")
         end = timer()
-        print("\n Time for main code", round(end-start,5))
-        # print(out_dict)
+        app_logger.info(" Time for main code :%s ", round(end-start,5))
+        # app_logger.info(out_dict)
         # stop profiling
         # pr.disable()
 
-        # print the profiling results
-        # pr.print_stats()
+        # app_logger.info the profiling results
+        # pr.app_logger.info_stats()
         # import pstats
 
 # create a Stats object from the cProfile object
         # stats = pstats.Stats(pr)
 
-        # print the top 10 functions by cumulative time
-        # stats.strip_dirs().sort_stats('cumulative').print_stats(10)
+        # app_logger.info the top 10 functions by cumulative time
+        # stats.strip_dirs().sort_stats('cumulative').app_logger.info_stats(10)
         return (out_dict)
     
     except ValueError:
+        app_logger.error('%s raised an error', ValueError)
         return "Invalid Input"
 
 
