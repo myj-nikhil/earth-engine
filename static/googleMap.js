@@ -11,12 +11,34 @@ async function initMap() {
   const { DrawingManager } = await google.maps.importLibrary("drawing");
   const { spherical } = await google.maps.importLibrary("geometry");
   const { SearchBox } = await google.maps.importLibrary("places");
+  const geojsonLayer = new google.maps.Data();
 
   // The map, centered at Uluru
   map = new Map(document.getElementById("map"), {
     center: { lat: 24, lng: 80 },
     zoom: 5,
     mapTypeId: "hybrid",
+  });
+  
+  geojsonLayer.loadGeoJson("https://node-api-postgres-qw2rp233lq-ue.a.run.app/geojson");
+  geojsonLayer.setMap(map);
+  // map.data.addGeoJson(tempobject);
+  geojsonLayer.setStyle({
+  fillColor: 'blue',
+  strokeWeight: 1
+  });
+
+  geojsonLayer.addListener("click", (event) => {
+    const name = event.feature.getProperty("name");
+    const phone = event.feature.getProperty("phone");
+    const area = event.feature.getProperty("area");
+    const content = `<div><b>Name:</b> ${name}</div><div><b>Phone:</b> ${phone}</div><div><b>Area:</b> ${area}</div>`;
+    const infowindow = new google.maps.InfoWindow({
+      content: content,
+    });
+    infowindow.setPosition(event.latLng);
+    infowindow.open(map);
+
   });
 
   map.setTilt(45);
@@ -94,7 +116,7 @@ async function initMap() {
   });
 
   const DrawManager = new DrawingManager({
-    drawingMode: google.maps.drawing.OverlayType.POLYGON,
+    // drawingMode: google.maps.drawing.OverlayType.POLYGON,
     drawingControlOptions: {
       position: google.maps.ControlPosition.RIGHT_TOP,
       drawingModes: [
