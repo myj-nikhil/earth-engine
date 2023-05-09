@@ -1,6 +1,7 @@
-// Initialize and add the map
 let map;
+let flag =0;
 let coordinates = [];
+let polygonArea;
 async function initMap() {
   // The location of Uluru
   // const position = { lat: -25.344, lng: 131.031 };
@@ -11,34 +12,12 @@ async function initMap() {
   const { DrawingManager } = await google.maps.importLibrary("drawing");
   const { spherical } = await google.maps.importLibrary("geometry");
   const { SearchBox } = await google.maps.importLibrary("places");
-  const geojsonLayer = new google.maps.Data();
 
   // The map, centered at Uluru
   map = new Map(document.getElementById("map"), {
     center: { lat: 24, lng: 80 },
     zoom: 5,
     mapTypeId: "hybrid",
-  });
-  
-  geojsonLayer.loadGeoJson("https://node-api-postgres-qw2rp233lq-ue.a.run.app/geojson");
-  geojsonLayer.setMap(map);
-  // map.data.addGeoJson(tempobject);
-  geojsonLayer.setStyle({
-  fillColor: 'blue',
-  strokeWeight: 1
-  });
-
-  geojsonLayer.addListener("click", (event) => {
-    const name = event.feature.getProperty("name");
-    const phone = event.feature.getProperty("phone");
-    const area = event.feature.getProperty("area");
-    const content = `<div><b>Name:</b> ${name}</div><div><b>Phone:</b> ${phone}</div><div><b>Area:</b> ${area}</div>`;
-    const infowindow = new google.maps.InfoWindow({
-      content: content,
-    });
-    infowindow.setPosition(event.latLng);
-    infowindow.open(map);
-
   });
 
   map.setTilt(45);
@@ -114,9 +93,9 @@ async function initMap() {
     });
     map.fitBounds(bounds);
   });
-
+  
   const DrawManager = new DrawingManager({
-    // drawingMode: google.maps.drawing.OverlayType.POLYGON,
+    drawingMode: google.maps.drawing.OverlayType.POLYGON,
     drawingControlOptions: {
       position: google.maps.ControlPosition.RIGHT_TOP,
       drawingModes: [
@@ -140,9 +119,11 @@ async function initMap() {
     let circleCoordinates =[circleCenter.lng(),circleCenter.lat()]
     console.log(circleCoordinates);
   });
-
+ 
+  
   DrawManager.addListener("polygoncomplete", function (polygon) {
     console.log("Polygon drawn");
+    flag=1;
     let path = polygon.getPath();
     console.log(path);
     // clear the stored coordinates
@@ -154,46 +135,93 @@ async function initMap() {
     console.log(coordinates);
     coordinates = coordinates.concat([coordinates[0]]);
     console.log("Final coordinates : ",coordinates);
-    // let polygonArea = spherical.computeArea(polygon);
+    polygonArea = spherical.computeArea(path);
+    polygonArea = Math.round(polygonArea,2) + " sq. m"
+    console.log(polygonArea)
     // alert(`Polygon area = ${polygonArea}`);
   });
-  // console.log("out of scope", coordinates);
+  // console.log("out of scope", coordinates);s
+  
 }
 
 initMap();
 
-function myfunction() {
-  console.log("button clicked")
-  const targetArea = document.getElementById("ans");
-  if (coordinates.length > 3) {
-    console.log(coordinates)
-    const s = JSON.stringify(coordinates);
-    let turfPolygon = turf.polygon([coordinates]);
-    let area = turf.area(turfPolygon);
-    console.log(`Area of the polygon is ${area}`)
-    const roundedArea = Math.round(area * 100) / 100;
-    ajaxPost(coordinates,targetArea,true,roundedArea);
-}
-else {
-    targetArea.innerHTML = 'Please select atleast 3 points'
+
+
+
+// create a polygon on the map
+
+
+// show the confirmation screen
+function showConfirmation() {
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+
+  // validate the name and phone number
+  if (name && phone && flag) {
+    // show the confirmation screen and populate the user's information
+    document.getElementById('name-confirmation').innerText = name;
+    document.getElementById('phone-confirmation').innerText = phone;
+    document.getElementById('polygon-confirmation').innerText = JSON.stringify(coordinates);
+    document.getElementById('confirmation').style.display = 'block';
+  } else {
+    alert('Please enter all the required fields and draw an area');
+  }
 }
 
+// submit the data to the server
+function submitData() {
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+
+  // console.log(area);
+  const userData = {
+    name: name,
+    phone: phone,
+    geojson: {
+      "type": "Feature",
+      "properties": {
+        "name": name,
+        "phone": phone,
+        "area": polygonArea
+      },
+      "geometry": {
+        "coordinates": [coordinates],
+        "type": "Polygon"
+      }
+    }
+  };
+
+  console.log(userData); // the complete data object
+
+
+
+
+  // submit the data to the server
+  // ...
+  // send a POST request to the API endpoint
+  fetch('https://node-api-postgres-qw2rp233lq-ue.a.run.app/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(userData)
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('User data submitted successfully!');
+        // reset the form and map
+        document.getElementById('name').value = '';
+        document.getElementById('phone').value = '';
+        // map.setMap(null);
+        // polygon.setPath([]);
+        document.getElementById('confirmation').style.display = 'none';
+        alert('Data submitted successfully!');
+      } else {
+        alert('Error submitting user data:' + response.statusText);
+      }
+    })
+    .catch(error => {
+      console.log('Error submitting user data:', error);
+    });
 }
-
-// function mySecondfunction() {
-//   console.log("button clicked")
-//   const targetArea = document.getElementById("ans");
-//   if (coordinates.length > 3) {
-//     console.log(coordinates)
-//     const s = JSON.stringify(coordinates);
-//     let turfPolygon = turf.polygon([coordinates]);
-//     let area = turf.area(turfPolygon);
-//     console.log(`Area of the polygon is ${area}`)
-//     const roundedArea = Math.round(area * 100) / 100;
-//     secondajaxPost(coordinates,targetArea,true,roundedArea);
-// }
-// else {
-//     targetArea.innerHTML = 'Please select atleast 3 points'
-// }
-
-// }

@@ -1,5 +1,19 @@
 import ee
 from timeit import default_timer as timer
+import logging
+
+app_logger = logging.getLogger('initialise.py')
+app_logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('app.log', mode='a')
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+file_handler.setFormatter(formatter)
+
+app_logger.addHandler(file_handler)
+
+
 
 # This function authenticates and initialises the google earth engine.
 ## Warning : ** Please keep the privatekey file safe and make sure you do not upload 
@@ -14,4 +28,4 @@ def initialise():
         service_account, 'project-xyz-383203.json')
     ee.Initialize(credentials)
     end = timer()
-    print("Time for initialisation : ", end-start)
+    app_logger.info("Time for initialisation : %s", end-start)

@@ -5,6 +5,18 @@ from give_data import given_data
 from v2_parallel import v2_parallel_point
 from timeit import default_timer as timer
 import ee
+import logging
+
+app_logger = logging.getLogger('main.py')
+app_logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('app.log', mode='a')
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+file_handler.setFormatter(formatter)
+
+app_logger.addHandler(file_handler)
 
 initialise()
 
@@ -41,6 +53,9 @@ def aa():
 def neway():
     return render_template('old-coordinates.html')
 
+@app.route("/form")
+def enterdata():
+    return render_template('form.html')
 
 # This function takes in user input(boundary coordinates) and returns a JSON object with the calculated data
 
@@ -48,23 +63,23 @@ def neway():
 # def calculate():
 #     # initialise() # Initialize the Earth Engine API
 #     input = request.get_json()
-#     print("Request arg type: ", type(input))
-#     print(input)
+#     app_logger.info("Request arg type: ", type(input))
+#     app_logger.info(input)
 #     result = json.loads(input) # Load the JSON input into a Python object
-#     print("\n Type of input: ", type(result))
-#     print("\n Input: ", result)
-#     print("\n length of input: ",len(result))
-#     print(result[0])
+#     app_logger.info("\n Type of input: ", type(result))
+#     app_logger.info("\n Input: ", result)
+#     app_logger.info("\n length of input: ",len(result))
+#     app_logger.info(result[0])
 #     inputlength = len(result)
     #Check whether the input is apoint or a polygon
     # if(inputlength > 2):
         # #region = ee.Geometry.Polygon(result)
-        # print("Input region is polygon")
+        # app_logger.info("Input region is polygon")
     # else: 
         # #region = ee.Geometry.Point(result)
-        # print("Input region is a Point")
+        # app_logger.info("Input region is a Point")
     # ans = given_data(region) # Calculate the data for the region using the Earth Engine API
-    # print("In calculate method :")
+    # app_logger.info("In calculate method :")
     # return jsonify(ans)  # Return a JSON object instead of a JSON string
 
 
@@ -73,28 +88,29 @@ def newcalculate():
     start =timer()
     # initialise() # Initialize the Earth Engine API
     input = request.get_json()
-    print("Request arg type: ", type(input))
-    print(input)
+    # app_logger.info("Request arg type: ", type(input))
+    # app_logger.info(input)
     result = json.loads(input) # Load the JSON input into a Python object
-    print("\n Type of input: ", type(result))
-    print("\n Input: ", result)
-    print("\n length of input: ",len(result))
-    print(result[0])
+    app_logger.info("Input is : %s",result)
+    app_logger.info("Type of input: %s ", type(result))
+    app_logger.info("Input: %s ", result)
+    app_logger.info("Length of input: %s ",str(len(result)))
+    app_logger.info("First element in input is: %s",result[0])
     inputlength = len(result)
     #Check whether the input is apoint or a polygon
     if(inputlength > 2):
         region = ee.Geometry.Polygon(result)
-        print("Input region is polygon")
+        app_logger.info("Input region is polygon")
         # ans = v2_parallel_point(region)
     else: 
         region = ee.Geometry.Point(result)
-        print("Input region is a Point")
+        app_logger.info("Input region is a Point")
     ans = v2_parallel_point(region)    
-    print("time until main passing :",round(timer()-start,5))
+    app_logger.info("time until main passing : %s ",round(timer()-start,5))
      # Calculate the data for the region using the Earth Engine API
-    # print("In calculate method :")
+    # app_logger.info("In calculate method :")
     end = timer()
-    print("\n time for calculate", round(end-start,5))
+    app_logger.info("Time for calculate %s", round(end-start,5))
     return jsonify(ans)  # Return a JSON object instead of a JSON string
 
 if __name__ == "__main__":
